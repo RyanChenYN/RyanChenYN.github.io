@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Modern Benchmark Suite for Instruction-Guided Video Editing Assessment (IVEBench).">
+  <meta name="keywords" content="Instruction-Guided Video Editing, Benchmark, MLLM">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IVEBench: Modern Benchmark Suite for Instruction-Guided Video Editing Assessment</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/ivebenchicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <style>
+
+    .hero.teaser .container {
+      max-width: 1000px;
+    }
+    .no-sort {
+        cursor: default;
+        pointer-events: none;
+        background-image: none !important;
+    }
+    
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        margin: 20px auto;
+    }
+    
+    .leaderboard-table th {
+        background-color: #f5f5f5;
+        padding: 12px 8px;
+        text-align: center;
+        border: 1px solid #ddd;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s;
+    }
+    
+    .leaderboard-table th.no-sort {
+        cursor: default;
+    }
+    
+    .leaderboard-table td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #ddd;
+        transition: background-color 0.2s;
+    }
+    
+    .leaderboard-table tbody tr:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .leaderboard-table tbody tr:hover td {
+        background-color: #f0f0f0;
+    }
+    
+    .leaderboard-table th:not(.no-sort):hover {
+        background-color: #e0e0e0;
+    }
+    
+    .leaderboard-table th.js-sort-active {
+        background-color: #d4edda;
+    }
+    
+    .leaderboard-table td.active-column {
+        background-color: #f0f9f4;
+    }
+    
+    .leaderboard-table tbody tr:hover td.active-column {
+        background-color: #e0f0e8;
+    }
+    
+    .leaderboard-table th:not(.no-sort)::after {
+        content: '';
+    }
+    
+    .leaderboard-table th.js-sort-active::after {
+        content: ' ⇅';
+        opacity: 1;
+    }
+    .leaderboard-table th.js-sort-asc::after,
+    .leaderboard-table th.js-sort-desc::after {
+        content: '';
+        display: inline-block;
+        margin-left: 6px;
+        width: 0;
+        height: 0;
+        vertical-align: middle;
+    }
+    .leaderboard-table th.js-sort-asc::after {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 6px solid #ffffff; 
+    }
+
+    .leaderboard-table th.js-sort-desc::after {
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid #ffffff; 
+    }
+
+    .leaderboard-table thead tr:first-child th {
+      border-right: 1px solid #ddd;
+    }
+    .leaderboard-table thead tr:nth-child(2) th {
+      border-right: 1px solid #ddd;
+    }
+    .video-duration {
+        background-color: #f0f0f0;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .video-duration p {
+        margin: 5px 0;
+    }
+
+    .leaderboard-container {
+        overflow-x: auto;
+        margin: 20px 0;
+    }
+
+    .video-caption {
+        text-align: left;
+        margin-top: 20px;
+        padding: 15px 25px;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border-left: 4px solid #e0e0e0;
+
+        max-height: 220px;  
+        overflow-y: auto;   
+        overflow-x: hidden; 
+    }
+
+    .video-caption::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .video-caption::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .video-caption::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .video-caption::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    .video-caption p {
+        margin: 8px 0;
+        word-wrap: break-word;
+    }
+
+    .video-caption .source-label {
+        color: #1e70bf;
+        font-weight: bold;
+    }
+
+    .video-caption .edit-label {
+        color: #ff8c00;
+        font-weight: bold;
+    }
+
+    .video-caption .target-label {
+        color: #e91e63;
+        font-weight: bold;
+    }
+
+    .carousel .item {
+        padding-bottom: 30px;
+    }
+
+  .group-header .category-label {
+      color: #800020;
+      font-weight: bold;
+      flex: 0 0 auto;
+  }
+
+  .group-header .subcategory-label {
+      color: #10d87b;
+      font-weight: bold;
+      flex: 0 0 auto;
+  }
+
+  .group-header .edit-label {
+      color: #ff8c00;
+      font-weight: bold;
+      flex: 0 0 auto;
+  }
+
+    .overview-text {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      max-width: 900px;
+      margin: 1.5rem auto 0 auto;
+      text-align: justify;
+      text-justify: inter-word;
+      color: #222;
+      hyphens: auto;
+    }
+
+    .overview-text .method {
+      font-family: "Courier New", Courier, monospace;
+      font-weight: bold;
+      color: #333;
+    }
+
+@media (max-width: 640px) {
+    .group-header .group-header-top,
+    .group-header .group-header-bottom {
+        flex-direction: row; 
+        flex-wrap: wrap;
+    }
+
+    .group-header .category-label,
+    .group-header .subcategory-label,
+    .group-header .edit-label {
+        margin-right: 0.3rem;
+    }
+
+    .group-header .category-value,
+    .group-header .subcategory-value,
+    .group-header .edit-text {
+        margin-right: 0.8rem;
+    }
+}
+        #results-carousel {
+      position: relative;
+    }
+
+    .video-groups-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background-color: rgba(255, 255, 255, 0.92);
+      padding: clamp(1.25rem, 4vw, 2rem);
+    }
+
+    .video-group {
+      display: none;
+      animation: fadeIn 0.45s ease;
+    }
+
+    .video-group.is-active {
+      display: block;
+    }
+
+    .group-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        margin-bottom: clamp(1rem, 2.5vw, 1.6rem);
+        padding: 0.85rem 1.2rem;
+        background: rgba(48, 70, 141, 0.07);
+        border: 1px solid rgba(58, 92, 180, 0.18);
+        border-radius: 14px;
+        font-size: clamp(0.95rem, 2.1vw, 1.05rem);
+        line-height: 1.6;
+        color: #1f2a44;
+    }
+
+
+    .group-header .group-header-top,
+    .group-header .group-header-bottom {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    .group-header .group-header-bottom {
+        margin-top: 0.2rem;
+    }
+
+
+    .group-header .category-label,
+    .group-header .subcategory-label,
+    .group-header .edit-label {
+        font-weight: 600;
+        margin-right: 0.3rem;  
+    }
+
+
+.group-header .category-value,
+.group-header .subcategory-value,
+.group-header .edit-text {
+    color: #1f2a44;
+    font-weight: 500;
+    margin-right: 1rem;  
+}
+
+.group-header .subcategory-label {
+    margin-left: 0;
+}
+
+    .video-row {
+      --video-target-height: clamp(100px, 10vw, 200px);
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .video-item {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .video-item.video-wide {
+      width: calc(var(--video-target-height) * 16 / 9);
+      max-width: 100%;
+    }
+
+    .video-item.video-square {
+      width: var(--video-target-height);
+      max-width: 100%;
+    }
+
+    .video-frame {
+      width: 100%;
+      height: var(--video-target-height);
+      background-color: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px -12px rgba(15, 23, 42, 0.45);
+    }
+
+    .video-item.video-wide video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .video-item.video-square video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-label {
+      margin-top: 0.65rem;
+      font-size: 0.82rem;
+      color: #5b5b5b;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: clamp(1.25rem, 3vw, 2rem);
+    }
+
+    .carousel-button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2951ff, #3273dc);
+      color: #fff;
+      box-shadow: 0 12px 22px -12px rgba(50, 115, 220, 0.85);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .carousel-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px -12px rgba(50, 115, 220, 0.9);
+      filter: brightness(1.03);
+    }
+
+    .carousel-button:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 10px 20px -12px rgba(50, 115, 220, 0.85);
+    }
+
+    .carousel-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      box-shadow: none;
+      filter: saturation(0.85);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+      const tables = document.querySelectorAll('.js-sort-table');
+
+      tables.forEach((table) => {
+        const headers = table.querySelectorAll('th:not(.no-sort)');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+
+        const updateRowNumbers = () => {
+          const rows = tbody.querySelectorAll('tr');
+          rows.forEach((row, index) => {
+            const numberCell = row.cells[0];
+            if (numberCell) {
+              numberCell.textContent = index + 1;
+            }
+          });
+        };
+
+        const clearHeaderState = () => {
+          headers.forEach((header) => {
+            header.classList.remove('js-sort-active', 'js-sort-asc', 'js-sort-desc');
+          });
+        };
+
+        const clearActiveColumn = () => {
+          table.querySelectorAll('td').forEach((cell) => {
+            cell.classList.remove('active-column');
+          });
+        };
+
+        const highlightColumn = (columnIndex) => {
+          const rows = tbody.querySelectorAll('tr');
+          rows.forEach((row) => {
+            const cell = row.cells[columnIndex];
+            if (cell) {
+              cell.classList.add('active-column');
+            }
+          });
+        };
+
+        const sortTable = (columnIndex, ascending, header) => {
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+
+          rows.sort((rowA, rowB) => {
+            const cellA = rowA.cells[columnIndex];
+            const cellB = rowB.cells[columnIndex];
+
+            const valueA = cellA ? cellA.textContent.trim() : '';
+            const valueB = cellB ? cellB.textContent.trim() : '';
+
+            if (valueA === '-' && valueB === '-') return 0;
+            if (valueA === '-') return ascending ? 1 : -1;
+            if (valueB === '-') return ascending ? -1 : 1;
+
+            const numA = parseFloat(valueA);
+            const numB = parseFloat(valueB);
+            const bothNumeric = !Number.isNaN(numA) && !Number.isNaN(numB);
+
+            if (bothNumeric) {
+              return ascending ? numA - numB : numB - numA;
+            }
+
+            return ascending
+              ? valueA.localeCompare(valueB)
+              : valueB.localeCompare(valueA);
+          });
+
+          rows.forEach((row) => tbody.appendChild(row));
+
+          updateRowNumbers();
+          clearActiveColumn();
+          highlightColumn(columnIndex);
+
+          clearHeaderState();
+          if (header) {
+            header.classList.add('js-sort-active');
+            header.classList.add(ascending ? 'js-sort-asc' : 'js-sort-desc');
+          }
+        };
+
+        headers.forEach((header) => {
+          const columnIndex = Number.parseInt(header.dataset.columnIndex, 10);
+          if (Number.isNaN(columnIndex)) return;
+
+          header.addEventListener('click', () => {
+            const isAscending = header.classList.contains('js-sort-asc');
+            sortTable(columnIndex, !isAscending, header);
+          });
+        });
+
+        updateRowNumbers();
+
+        const defaultHeader = table.querySelector('th[data-column-index="2"]');
+        if (defaultHeader) {
+          sortTable(2, false, defaultHeader);
+        }
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const groups = Array.from(document.querySelectorAll(".video-group"));
+      const prevButton = document.getElementById("prevGroup");
+      const nextButton = document.getElementById("nextGroup");
+      let currentGroupIndex = 0;
+
+      const syncButtonsState = () => {
+        prevButton.disabled = currentGroupIndex === 0;
+        nextButton.disabled = currentGroupIndex === groups.length - 1;
+      };
+
+      const handleVideosVisibility = (group, shouldPlay) => {
+        const videos = group.querySelectorAll("video");
+        videos.forEach((video) => {
+          if (shouldPlay) {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {
+              });
+            }
+          } else {
+            video.pause();
+            video.currentTime = 0;
+          }
+        });
+      };
+
+      const showGroup = (index) => {
+        groups.forEach((group, i) => {
+          if (i === index) {
+            group.classList.add("is-active");
+            handleVideosVisibility(group, true);
+          } else {
+            if (group.classList.contains("is-active")) {
+              handleVideosVisibility(group, false);
+            }
+            group.classList.remove("is-active");
+          }
+        });
+        syncButtonsState();
+      };
+
+      prevButton.addEventListener("click", () => {
+        if (currentGroupIndex > 0) {
+          currentGroupIndex -= 1;
+          showGroup(currentGroupIndex);
+        }
+      });
+
+      nextButton.addEventListener("click", () => {
+        if (currentGroupIndex < groups.length - 1) {
+          currentGroupIndex += 1;
+          showGroup(currentGroupIndex);
+        }
+      });
+
+      showGroup(currentGroupIndex);
+    });
+  </script>
+</head>
+<body>
+
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+<h1 class="title is-1 publication-title">
+  <img src="static/images/ivebenchicon.svg" alt="IVEBench Icon" style="height: 1.2em; vertical-align: text-top;">
+  <span style="color: #E63946;">I</span><span style="color: #F77F00;">V</span><span style="color: #FCBF49;">E</span><span style="color: #06A77D;">B</span><span style="color: #4ECDC4;">e</span><span style="color: #4285F4;">n</span><span style="color: #9B59B6;">c</span><span style="color: #ee2885;">h</span>
+</h1>
+          <h1 class="title is-3" style="font-weight: normal;">Modern Benchmark Suite for Instruction-Guided Video Editing Assessment</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=-WKfgd0AAAAJ">Yinan Chen</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://zhangzjn.github.io/">Jiangning Zhang</a><sup>1,2</sup>,</span>
+            <span class="author-block">
+              <a href="https://sjtuplayer.github.io/">Teng Hu</a><sup>3</sup>,
+            </span>
+            <span class="author-block">
+              <a>Yuxiang Zeng</a><sup>4</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://xzc-zju.github.io/">Zhucun Xue</a><sup>1</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=gUJWww0AAAAJ">Qingdong He</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=fqte5H4AAAAJ">Chengjie Wang</a><sup>2,3</sup>
+            </span>
+            <span class="author-block">
+              <a href="https://person.zju.edu.cn/yongliu">Yong Liu</a><sup>1</sup>
+            </span>
+            <span class="author-block">
+              <a href="https://huuxiaobin.github.io/">Xiaobin Hu</a><sup>2,5</sup>
+            </span>
+            <span class="author-block">
+              <a href="https://yanshuicheng.info/">Shuicheng Yan</a><sup>6</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Zhejiang University,</span>
+            <span class="author-block"><sup>2</sup>Tencent Youtu Lab,</span>
+            <span class="author-block"><sup>3</sup>Shanghai Jiao Tong University,</span>
+            <span class="author-block"><sup>4</sup>University of Auckland,</span>
+            <span class="author-block"><sup>5</sup>Technische Universität München,</span>
+            <span class="author-block"><sup>6</sup>National University of Singapore</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-video"></i>
+                  </span>
+                  <span>Data</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="#leaderboard" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-trophy"></i>
+                  </span>
+                  <span>Leaderboard</span>
+                </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser" style="margin-bottom: 4rem;">
+  <div class="container ">
+          <!-- Highlights. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column ">
+        <h2 class="title is-3">Highlights</h2>
+        <div class="content has-text-justified">
+          <p>
+            Compared with existing video editing benchmarks, our proposed <strong>IVEBench</strong> offers the following key advantages:
+          </p>
+          <p style="margin-bottom: 0.2rem;">
+            <strong>(1) Comprehensive support for IVE methods:</strong> IVEBench is specifically designed to evaluate instruction-guided video editing (IVE) models while remaining compatible with traditional source-target prompt-based methods, ensuring broad applicability across editing paradigms;
+          </p>
+          <p style="margin-bottom: 0.2rem;">
+            <strong>(2) Diverse and semantically rich video corpus:</strong> The benchmark contains 600 high-quality source videos spanning <em>seven semantic dimensions</em> and <em>thirty topics</em>, with frame lengths ranging from 32 to 1,024, providing wide coverage of real-world scenarios;
+          </p>
+          <p style="margin-bottom: 0.2rem;">
+            <strong>(3) Comprehensive editing taxonomy:</strong> IVEBench includes <em>eight major editing categories</em> and <em>thirty-five subcategories</em>, encompassing diverse editing types such as style, attribute, subject motion, camera motion, and visual effect editing, to fully represent instruction-guided behaviors;
+          </p>
+          <p style="margin-bottom: 0.2rem;">
+            <strong>(4) Integration of MLLM-based and traditional metrics:</strong> The evaluation protocol combines conventional objective indicators with multimodal large language model (MLLM)-based assessments across <em>three dimensions</em> (video quality, instruction compliance, and video fidelity) for more human-aligned and holistic evaluation;
+          </p>
+          <p style="margin-bottom: 0.2rem;">
+            <strong>(5) Extensive benchmarking of state-of-the-art models:</strong> We conduct a thorough quantitative and qualitative evaluation of leading IVE models—including <em>InsV2V, AnyV2V,</em> <em>StableV2V</em>, as well as the multi-conditional video editing framework <em>VACE</em>, establishing a unified and fair standard for future research.
+          </p>
+        </div>
+      </div>
+    </div>
+    <!--/ Highlights. -->
+      <img 
+        id="teaser-image"
+        src="./static/images/teaser2.png" 
+        alt="Teaser Image"
+        style="width: 100%; height: auto; border-radius: 8px;"
+      >
+
+    </div>
+</section>
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-short_0002">
+          <video poster="" id="short_0002" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0002_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Transform the video into an oil painting style</p>
+            <p><span class="source-label">Source prompt:</span> The video showcases a stack of golden pancakes topped with fresh strawberries and drizzled with chocolate sauce. The setting appears to be a bright, cheerful kitchen with various breakfast items in the background.</p>
+            <p><span class="target-label">Target prompt:</span> The video showcases a stack of golden pancakes topped with fresh strawberries and drizzled with chocolate sauce in an oil painting style. The setting appears to be a bright, cheerful kitchen with various breakfast items in the background.</p>
+          </div>
+        </div>
+        <div class="item item-short_0004">
+          <video poster="" id="short_0004" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0004_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Change the style of the video to anime</p>
+            <p><span class="source-label">Source prompt:</span> Three individuals dressed in medieval-style armor are engaged in a conversation in a forest setting. They appear to be discussing something important, possibly planning a strategy or sharing information.</p>
+            <p><span class="target-label">Target prompt:</span> Three individuals dressed in medieval-style armor are engaged in a conversation in a forest setting in anime style. They appear to be discussing something important, possibly planning a strategy or sharing information.</p>
+          </div>
+        </div>
+        <div class="item item-short_0020">
+          <video poster="" id="short_0020" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0020_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Zoom out the view of Earth from space</p>
+            <p><span class="source-label">Source prompt:</span> The video showcases a stunning view of Earth from space during nighttime, with the planet illuminated by city lights and a bright sun on the horizon.</p>
+            <p><span class="target-label">Target prompt:</span> The video showcases a zoomed-out view of Earth from space during nighttime, with the planet illuminated by city lights and a bright sun on the horizon.</p>
+          </div>
+        </div>
+        <div class="item item-short_0067">
+          <video poster="" id="short_0067" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0067_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Add a violinist in the background</p>
+            <p><span class="source-label">Source prompt:</span> The video captures two individuals performing outdoors at night. One person is holding a microphone and appears to be singing or speaking, while the other stands beside them, observing or waiting for their turn. The setting is illuminated by ambient streetlights and distant city lights, creating a serene yet engaging atmosphere.</p>
+            <p><span class="target-label">Target prompt:</span> The video captures two individuals performing outdoors at night. One person is holding a microphone and appears to be singing or speaking, while the other stands beside them, observing or waiting for their turn. There is also a violinist in the background. The setting is illuminated by ambient streetlights and distant city lights, creating a serene yet engaging atmosphere.</p>
+          </div>
+        </div>
+        <div class="item item-short_0068">
+          <video poster="" id="short_0068" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0068_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Scale up the jade pendant</p>
+            <p><span class="source-label">Source prompt:</span> A skilled artisan meticulously carves intricate details into a green jade pendant featuring a dragon design. The pendant is held securely in hand, and a precision tool is used to enhance the fine lines and textures of the dragon's scales and features.</p>
+            <p><span class="target-label">Target prompt:</span> A skilled artisan meticulously carves intricate details into a larger green jade pendant featuring a dragon design. The pendant is held securely in hand, and a precision tool is used to enhance the fine lines and textures of the dragon's scales and features.</p>
+          </div>
+        </div>
+        <div class="item item-short_00104">
+          <video poster="" id="short_0104" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0104_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Move the book behind the dog.</p>
+            <p><span class="source-label">Source prompt:</span> A dog wearing glasses is sitting on a bed with an open book in front of it, creating a humorous and endearing scene.</p>
+            <p><span class="target-label">Target prompt:</span> A dog wearing glasses is sitting on a bed with the open book placed behind it, creating a humorous and endearing scene.</p>
+          </div>
+        </div>
+        <div class="item item-short_00105">
+          <video poster="" id="short_0105" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0105_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Change the running young people to walking</p>
+            <p><span class="source-label">Source prompt:</span> A group of young people are skateboarding and running through an underground tunnel. The scene captures their dynamic movements and the urban environment around them.</p>
+            <p><span class="target-label">Target prompt:</span> A group of young people are skateboarding and walking through an underground tunnel. The scene captures their movements and the urban environment around them.</p>
+          </div>
+        </div>
+        <div class="item item-short_0122">
+          <video poster="" id="short_0122" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0122_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Change the black clothing to red</p>
+            <p><span class="source-label">Source prompt:</span> The video depicts a dramatic battle scene, in which a warrior dressed in black stands triumphantly atop a pile of defeated enemies under a stormy sky.</p>
+            <p><span class="target-label">Target prompt:</span> The video depicts a dramatic battle scene, in which a warrior dressed in red stands triumphantly atop a pile of defeated enemies under a stormy sky.</p>
+          </div>
+        </div>
+        <div class="item item-short_0172">
+          <video poster="" id="short_0172" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0172_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Transform the video into a watercolor style</p>
+            <p><span class="source-label">Source prompt:</span> The video showcases a majestic clock tower under a bright blue sky with fluffy white clouds. The tower is intricately designed with detailed architecture, featuring a large clock face and ornate sculptures. The scene is serene and emphasizes the grandeur of the structure.</p>
+            <p><span class="target-label">Target prompt:</span> The video showcases a watercolor-style majestic clock tower under a bright blue sky with fluffy white clouds. The tower is intricately designed with detailed architecture, featuring a large clock face and ornate sculptures. The scene is serene and emphasizes the grandeur of the structure.</p>
+          </div>
+        </div>
+        <div class="item item-short_0185">
+          <video poster="" id="short_0185" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0185_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Replace the character lying on the floor with a small animated teddy bear</p>
+            <p><span class="source-label">Source prompt:</span> The video depicts a lively scene inside a cozy room where four animated characters are dancing and having fun. One character is lying on the floor, seemingly exhausted or resting, while the others are energetically moving around. The room is decorated with colorful curtains, a calendar with a rabbit design, and various household items, creating a warm and inviting atmosphere.</p>
+            <p><span class="target-label">Target prompt:</span> The video depicts a lively scene inside a cozy room where four animated characters are dancing and having fun. One small animated teddy bear is lying on the floor, seemingly exhausted or resting, while the others are energetically moving around. The room is decorated with colorful curtains, a calendar with a rabbit design, and various household items, creating a warm and inviting atmosphere.</p>
+          </div>
+        </div>
+        <div class="item item-short_0218">
+          <video poster="" id="short_0218" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/short_0218_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Zoom out the view of the video</p>
+            <p><span class="source-label">Source prompt:</span> The video features an animated character, a young woman with blonde hair tied in a braid, standing against a backdrop of a glowing sunset sky. She is dressed in a dark outfit and has her eyes closed, with one hand raised as if she is feeling the warmth of the sun.</p>
+            <p><span class="target-label">Target prompt:</span> The video features an animated character, a young woman with blonde hair tied in a braid, standing against a backdrop of a glowing sunset sky. She is dressed in a dark outfit and has her eyes closed, with one hand raised as if she is feeling the warmth of the sun, shown in a wider view.</p>
+          </div>
+        </div>
+        <div class="item item-long_0015">
+          <video poster="" id="long_0015" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/long_0015_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Add a flock of birds flying above the Arch of Peace</p>
+            <p><span class="source-label">Source prompt:</span> The video showcases the majestic Arch of Peace in Milan, Italy, under a clear blue sky. The arch is a grand structure with intricate carvings and statues, surrounded by a well-maintained green lawn. The scene is serene, with a few people walking around, adding a sense of scale to the monumental architecture.</p>
+            <p><span class="target-label">Target prompt:</span> The video showcases the majestic Arch of Peace in Milan, Italy, under a clear blue sky. The arch is a grand structure with intricate carvings and statues, surrounded by a well-maintained green lawn. There is a flock of birds flying above the arch. The scene is serene, with a few people walking around, adding a sense of scale to the monumental architecture.</p>
+          </div>
+        </div>
+        <div class="item item-long_0029">
+          <video poster="" id="long_0029" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/long_0029_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Adjust the colors of the video to a warmer tone</p>
+            <p><span class="source-label">Source prompt:</span> The video captures an aerial view of a bustling city intersection with vehicles moving in various directions. The scene is set during the day with clear visibility, showcasing the organized chaos of urban traffic.</p>
+            <p><span class="target-label">Target prompt:</span> The video captures an aerial view of a bustling city intersection with vehicles moving in various directions. The scene is set during the day with clear visibility, showcasing the organized chaos of urban traffic with warmer-toned colors.</p>
+          </div>
+        </div>
+        <div class="item item-long_0074">
+          <video poster="" id="long_0074" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/long_0074_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Move the sliced kiwi closer to the camera.</p>
+            <p><span class="source-label">Source prompt:</span> The video showcases a close-up of a sliced kiwi fruit, highlighting its vibrant green flesh and black seeds, set against a green background with other green fruits and vegetables.</p>
+            <p><span class="target-label">Target prompt:</span> The video showcases a close-up of a closer sliced kiwi fruit, highlighting its vibrant green flesh and black seeds. set against a green background with other green fruits and vegetables.</p>
+          </div>
+        </div>
+        <div class="item item-long_0118">
+          <video poster="" id="long_0118" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/long_0118_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Scale up the motorcycle and the motorcyclist</p>
+            <p><span class="source-label">Source prompt:</span> A motorcyclist rides down a highway at dusk, wearing full protective gear and a helmet, with the motorcycle's headlights illuminating the road ahead.</p>
+            <p><span class="target-label">Target prompt:</span> A larger motorcyclist rides down a highway at dusk, wearing full protective gear and a helmet, with the motorcycle's headlights illuminating the road ahead.</p>
+          </div>
+        </div>
+        <div class="item item-long_0186">
+          <video poster="" id="long_0186" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/long_0186_h264.mp4"
+                    type="video/mp4">
+          </video>
+          <div class="video-caption">
+            <p><span class="edit-label">Edit prompt:</span> Make the man, woman in black blazer, and the other woman move around the room in a coordinated dance</p>
+            <p><span class="source-label">Source prompt:</span> A woman in a black blazer is talking to a man and a woman in a room decorated with balloons and a Christmas tree.</p>
+            <p><span class="target-label">Target prompt:</span> A woman in a black blazer, a man, and another woman are dancing around a room decorated with balloons and a Christmas tree.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  </div>
+</section>
+
+<!-- LEADERBOARD SECTION -->
+<section class="section">
+  <div class="container">
+    
+    <div class="columns is-centered">
+      <div class="column is-full has-text-centered content">
+
+        <h2 class="title is-3" id="leaderboard">Leaderboard</h2>
+        <div class="content">
+          <p class="mt-3">Comprehensive evaluation results of instruction-guided video editing methods on IVEBench.
+          </p>
+
+          <h2 class="subtitle is-4" id="leaderboard_short">Leaderboard (Short Subset)</h2>
+
+          <div class="leaderboard-container">
+          <table class="js-sort-table leaderboard-table" id="results-short">
+            <thead>
+              <tr>
+                <th rowspan="2" class="no-sort" style="vertical-align: middle; width: 50px;"><strong>#</strong></th>
+                <th rowspan="2" class="no-sort" style="vertical-align: middle; width: 150px;"><strong>Method</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 100px;" data-column-index="2"><strong>Total Score</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 100px;" data-column-index="3"><strong>Video Quality</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 120px;" data-column-index="4"><strong>Instruction<br>Compliance</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 100px;" data-column-index="5"><strong>Video Fidelity</strong></th>
+                <th colspan="5" class="no-sort" style="vertical-align: middle;"><strong>Video Quality (Details)</strong></th>
+                <th colspan="4" class="no-sort" style="vertical-align: middle;"><strong>Instruction Compliance (Details)</strong></th>
+                <th colspan="3" class="no-sort" style="vertical-align: middle;"><strong>Video Fidelity (Details)</strong></th>
+              </tr>
+              <tr>
+                <th style="width: 100px;" data-column-index="6"><strong>Subject<br>Consistency</strong></th>
+                <th style="width: 110px;" data-column-index="7"><strong>Background<br>Consistency</strong></th>
+                <th style="width: 100px;" data-column-index="8"><strong>Temporal<br>Flickering</strong></th>
+                <th style="width: 100px;" data-column-index="9"><strong>Motion<br>Smoothness</strong></th>
+                <th style="width: 80px;" data-column-index="10"><strong>VTSS</strong></th>
+                <th style="width: 120px;" data-column-index="11"><strong>Overall Semantic<br>Consistency</strong></th>
+                <th style="width: 120px;" data-column-index="12"><strong>Phrase Semantic<br>Consistency</strong></th>
+                <th style="width: 120px;" data-column-index="13"><strong>Instruction<br>Satisfaction</strong></th>
+                <th style="width: 110px;" data-column-index="14"><strong>Quantity<br>Accuracy</strong></th>
+                <th style="width: 110px;" data-column-index="15"><strong>Semantic<br>Fidelity</strong></th>
+                <th style="width: 110px;" data-column-index="16"><strong>Motion<br>Fidelity</strong></th>
+                <th style="width: 110px;" data-column-index="17"><strong>Content<br>Fidelity</strong></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td style="text-align: left; padding: 8px;"><strong>InsV2V</strong></td>
+                <td>0.65715</td>
+                <td>0.802357</td>
+                <td>0.374118</td>
+                <td>0.794976</td>
+                <td>0.901442</td>
+                <td>0.944001</td>
+                <td>0.975373</td>
+                <td>0.975373</td>
+                <td>0.04835</td>
+                <td>0.240611</td>
+                <td>0.229095</td>
+                <td>3.1</td>
+                <td>0.2</td>
+                <td>0.952295</td>
+                <td>0.678833</td>
+                <td>4.125</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td style="text-align: left; padding: 8px;"><strong>VACE</strong></td>
+                <td>0.616088</td>
+                <td>0.801204</td>
+                <td>0.267255</td>
+                <td>0.779804</td>
+                <td>0.916832</td>
+                <td>0.94867</td>
+                <td>0.959168</td>
+                <td>0.959168</td>
+                <td>0.048467</td>
+                <td>0.235583</td>
+                <td>0.215446</td>
+                <td>2.27</td>
+                <td>0.2</td>
+                <td>0.963778</td>
+                <td>0.883994</td>
+                <td>3.735</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td style="text-align: left; padding: 8px;"><strong>Anyv2v</strong></td>
+                <td>0.55052</td>
+                <td>0.724021</td>
+                <td>0.355533</td>
+                <td>0.572005</td>
+                <td>0.836517</td>
+                <td>0.91594</td>
+                <td>0.969898</td>
+                <td>0.969898</td>
+                <td>0.028747</td>
+                <td>0.215527</td>
+                <td>0.228784</td>
+                <td>3.251852</td>
+                <td>0</td>
+                <td>0.796468</td>
+                <td>0.824666</td>
+                <td>2.651852</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td style="text-align: left; padding: 8px;"><strong>StableV2V</strong></td>
+                <td>0.509333</td>
+                <td>0.693736</td>
+                <td>0.420937</td>
+                <td>0.413327</td>
+                <td>0.828293</td>
+                <td>0.905021</td>
+                <td>0.962683</td>
+                <td>0.962683</td>
+                <td>0.02092</td>
+                <td>0.204132</td>
+                <td>0.234756</td>
+                <td>3.44898</td>
+                <td>0.25</td>
+                <td>0.70401</td>
+                <td>0.773338</td>
+                <td>1.785714</td>
+              </tr>
+            </tbody>                                                   
+          </table>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+<!-- END LEADERBOARD SECTION -->
+
+<div class="container">
+    
+  <div class="columns is-centered">
+    <div class="column is-full has-text-centered content">
+
+      <h2 class="subtitle is-4" id="leaderboard_long">Leaderboard (Long Subset)</h2>
+      <div class="content">
+
+        <div class="leaderboard-container">
+          <table class="js-sort-table leaderboard-table" id="results-long">
+            <thead>
+              <tr>
+                <th rowspan="2" class="no-sort" style="vertical-align: middle; width: 50px;"><strong>#</strong></th>
+                <th rowspan="2" class="no-sort" style="vertical-align: middle; width: 150px;"><strong>Method</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 100px;" data-column-index="2"><strong>Total Score</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 100px;" data-column-index="3"><strong>Video Quality</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 120px;" data-column-index="4"><strong>Instruction<br>Compliance</strong></th>
+                <th rowspan="2" style="vertical-align: middle; width: 100px;" data-column-index="5"><strong>Video Fidelity</strong></th>
+                <th colspan="5" class="no-sort" style="vertical-align: middle;"><strong>Video Quality (Details)</strong></th>
+                <th colspan="4" class="no-sort" style="vertical-align: middle;"><strong>Instruction Compliance (Details)</strong></th>
+                <th colspan="3" class="no-sort" style="vertical-align: middle;"><strong>Video Fidelity (Details)</strong></th>
+              </tr>
+              <tr>
+                <th style="width: 100px;" data-column-index="6"><strong>Subject<br>Consistency</strong></th>
+                <th style="width: 110px;" data-column-index="7"><strong>Background<br>Consistency</strong></th>
+                <th style="width: 100px;" data-column-index="8"><strong>Temporal<br>Flickering</strong></th>
+                <th style="width: 100px;" data-column-index="9"><strong>Motion<br>Smoothness</strong></th>
+                <th style="width: 80px;" data-column-index="10"><strong>VTSS</strong></th>
+                <th style="width: 120px;" data-column-index="11"><strong>Overall Semantic<br>Consistency</strong></th>
+                <th style="width: 120px;" data-column-index="12"><strong>Phrase Semantic<br>Consistency</strong></th>
+                <th style="width: 120px;" data-column-index="13"><strong>Instruction<br>Satisfaction</strong></th>
+                <th style="width: 110px;" data-column-index="14"><strong>Quantity<br>Accuracy</strong></th>
+                <th style="width: 110px;" data-column-index="15"><strong>Semantic<br>Fidelity</strong></th>
+                <th style="width: 110px;" data-column-index="16"><strong>Motion<br>Fidelity</strong></th>
+                <th style="width: 110px;" data-column-index="17"><strong>Content<br>Fidelity</strong></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td style="text-align: left; padding: 8px;"><strong>InsV2V</strong></td>
+                <td>0.65715</td>
+                <td>0.802357</td>
+                <td>0.374118</td>
+                <td>0.794976</td>
+                <td>0.901442</td>
+                <td>0.944001</td>
+                <td>0.975373</td>
+                <td>0.975373</td>
+                <td>0.04835</td>
+                <td>0.240611</td>
+                <td>0.229095</td>
+                <td>3.1</td>
+                <td>0.2</td>
+                <td>0.952295</td>
+                <td>0.678833</td>
+                <td>4.125</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td style="text-align: left; padding: 8px;"><strong>VACE</strong></td>
+                <td>0.616088</td>
+                <td>0.801204</td>
+                <td>0.267255</td>
+                <td>0.779804</td>
+                <td>0.916832</td>
+                <td>0.94867</td>
+                <td>0.959168</td>
+                <td>0.959168</td>
+                <td>0.048467</td>
+                <td>0.235583</td>
+                <td>0.215446</td>
+                <td>2.27</td>
+                <td>0.2</td>
+                <td>0.963778</td>
+                <td>0.883994</td>
+                <td>3.735</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td style="text-align: left; padding: 8px;"><strong>Anyv2v</strong></td>
+                <td>0.55052</td>
+                <td>0.724021</td>
+                <td>0.355533</td>
+                <td>0.572005</td>
+                <td>0.836517</td>
+                <td>0.91594</td>
+                <td>0.969898</td>
+                <td>0.969898</td>
+                <td>0.028747</td>
+                <td>0.215527</td>
+                <td>0.228784</td>
+                <td>3.251852</td>
+                <td>0</td>
+                <td>0.796468</td>
+                <td>0.824666</td>
+                <td>2.651852</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td style="text-align: left; padding: 8px;"><strong>StableV2V</strong></td>
+                <td>0.509333</td>
+                <td>0.693736</td>
+                <td>0.420937</td>
+                <td>0.413327</td>
+                <td>0.828293</td>
+                <td>0.905021</td>
+                <td>0.962683</td>
+                <td>0.962683</td>
+                <td>0.02092</td>
+                <td>0.204132</td>
+                <td>0.234756</td>
+                <td>3.44898</td>
+                <td>0.25</td>
+                <td>0.70401</td>
+                <td>0.773338</td>
+                <td>1.785714</td>
+              </tr>
+            </tbody>                                                   
+          </table>
+        </div>
+
+        <p style="text-align: left; margin-top: 25px; font-size: 14px; color: #666; margin-bottom: 30px;">
+          <strong>Note:</strong> Higher values indicate better performance for all metrics. Click on column headers to sort by different metrics.
+        </p>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body has-text-centered">
+  <h1 class="title is-1 mathvista_other">
+    <span class="mathvista_other" style="vertical-align: middle">Benchmark</span>
+  </h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered">
+          <h2 class="title is-3" style="margin-top: 30px;">Data Pipeline</h2>
+          <img src="./static/images/pipeline.png" alt="data-composition" style="max-width: 90%; display: block; margin: 0 auto;">
+          <p style="text-align: center; margin: 40px auto 0 auto; width: 50%;"> 
+              <strong>Data acquisition and processing pipeline of IVEBench. </strong><strong><em>1)</em></strong> Curation process to 600 high-quality diverse videos. <strong><em>2)</em></strong> Well-designed pipeline for comprehensive editing prompts.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered">
+          <h2 class="title is-3" style="margin-top: 30px;">Benchmark Statistics</h2>
+          <img src="./static/images/data_fig1.png" alt="data-composition" style="max-width: 90%; display: block; margin: 0 auto;">
+          <p style="text-align: center; margin: 40px auto 0 auto; width: 50%;"> 
+              Statistical distributions of IVEBench
+          </p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered">
+          <h2 class="title is-3">Benchmark Comparison</h2>
+          <img src="./static/images/benchmark_compare.png" alt="data-composition" style="max-width: 90%;">
+          <p style="text-align: center; margin-left: auto; margin-right: auto; width: 50%;">
+            <strong>Attributes comparison with open-source video editing benchmarks.</strong> Our proposed IVEBench boasts distinct advantages across various key dimensions.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body has-text-centered">
+  <h1 class="title is-1 mathvista_other">
+    <span class="mathvista_other" style="vertical-align: middle">Experiments</span>
+  </h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered">
+          <h2 class="title is-3" style="margin-top: 30px;">Qualitative Visualization</h2>
+
+          
+          <div id="results-carousel" class="results-carousel"> 
+          <div class="video-groups-wrapper" aria-live="polite">
+            <!-- 组 1 -->
+            <div class="video-group is-active" data-group-index="0">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0004_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0004_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0004_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0004_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0004_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0004_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0004_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0004_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0004_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0004_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Style Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Anime</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">Change the style of the video to anime</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 组 2 -->
+            <div class="video-group" data-group-index="1">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0036_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0036_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0036_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0036_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0036_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0036_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0036_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0036_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0036_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0036_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Effect Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Transition</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">After a wave-foam transition, the small fishing boat is eaten by a giant whale</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 组 3 -->
+            <div class="video-group" data-group-index="2">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0044_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0044_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0044_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0044_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0044_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0044_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0044_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0044_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0044_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0044_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Subject Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Replace Existing Subject</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">Replace the water bottle in the scene with a newspaper</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 组 4 -->
+            <div class="video-group" data-group-index="3">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0064_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0064_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0064_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0064_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0064_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0064_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0064_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0064_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0064_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0064_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Camera Angle Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Front View</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">Change the view to a front view</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 组 5 -->
+            <div class="video-group" data-group-index="4">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0080_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0080_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0080_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0080_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0080_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0080_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0080_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0080_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0080_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0080_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Subject Motion Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Single Subject Motion</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">Make the static spider-man in the mural dynamic and make him swing faster</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 组 6 -->
+            <div class="video-group" data-group-index="5">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0172_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0172_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0172_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0172_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0172_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0172_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0172_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0172_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0172_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0172_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Style Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Watercolor</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">Transform the video into a watercolor style</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 组 7 -->
+            <div class="video-group" data-group-index="6">
+              <div class="video-row">
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0384_source" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/source/short_0384_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">Source Video</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0384_insv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/insv2v/short_0384_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">InsV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0384_anyv2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/anyv2v/short_0384_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">AnyV2V</div>
+                </div>
+
+                <div class="video-item video-square">
+                  <div class="video-frame">
+                    <video poster="" id="short_0384_stablev2v" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/stablev2v/short_0384_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">StableV2V</div>
+                </div>
+
+                <div class="video-item video-wide">
+                  <div class="video-frame">
+                    <video poster="" id="short_0384_vace" autoplay controls muted loop playsinline>
+                      <source src="./static/videos_compare/vace/short_0384_h264.mp4" type="video/mp4" />
+                    </video>
+                  </div>
+                  <div class="video-label">VACE</div>
+                </div>
+              </div>
+              <div class="group-header">
+                <div class="group-header-top">
+                  <span class="category-label">Category:</span><span class="category-value">Camera Motion Editing</span><span class="subcategory-label">Subcategory:</span><span class="subcategory-value">Dolly In</span>
+                </div>
+                <div class="group-header-bottom">
+                  <span class="edit-label">Edit prompt:</span><span class="edit-text">Move the camera closer to the man in the black shirt</span>
+                </div>
+              </div>
+            </div>
+
+
+
+
+            <div class="container">
+              <div class="columns is-centered">
+                <div class="column has-text-centered">
+                  <button id="prevGroup" class="button is-rounded" disabled>
+                    <span class="icon">
+                      <i class="fas fa-chevron-left"></i>
+                    </span>
+                    <span>Previous</span>
+                  </button>
+                  <button id="nextGroup" class="button is-rounded" style="margin-left: 10px;">
+                    <span>Next</span>
+                    <span class="icon">
+                      <i class="fas fa-chevron-right"></i>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          <img src="./static/images/qualitative_analysis.png" alt="data-composition" style="max-width: 90%; display: block; margin: 50px auto 0 auto;">
+          <p style="text-align: center; margin: 40px auto 80px auto; width: 50%;"> 
+              Qualitative comparison of state-of-the-art IVE methods.
+          </p>
+      </div>
+    </div>
+
+
+          <h2 class="title is-3" style="margin-top: 30px; text-align: center;">Quantitative Visualization</h2>
+          <img src="./static/images/radar_chart.png" alt="data-composition" style="max-width: 90%; display: block; margin: 0 auto;">
+          <p style="text-align: center; margin: 40px auto 80px auto; width: 50%;"> 
+              <strong>IVEBench Evaluation Results of Video Editing Models.</strong> We visualize the evaluation results of four IVE models in 12 IVEBench metrics. We normalize the results per dimension for clearer comparisons.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{chen2025ivebench,
+  author    = {yinanchen, yuxiangzeng, zhucunxue, qingdonghe, chengjiewang, yongliu, xiaobinhuxiaobinhu, shuichengyan},
+  title     = {IVEBench: Modern Benchmark Suite for Instruction-Guided Video Editing Assessment},
+  journal   = {arXiv preprint arXiv:xxx},
+  year      = {2025},
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Website source code based on the <a href="https://nerfies.github.io/"> Nerfies</a> project page. If you want to reuse their <a href="https://github.com/nerfies/nerfies.github.io">source code</a>, please credit them appropriately.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
+

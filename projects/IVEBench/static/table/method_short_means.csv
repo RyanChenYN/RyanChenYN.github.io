@@ -1,0 +1,5 @@
+﻿method,background_consistency_score,content_fidelity_score,instruction_satisfaction_score,motion_fidelity_score,motion_smoothness_score,overall_semantic_consistency_score,phrase_semantic_consistency_score,quantity_accuracy_score,semantic_fidelity_score,subject_consistency_score,temporal_flickering_score,vtss_score
+anyv2v_short_output,0.939805276,2.75,3.335,0.815907657,0.972574907,0.215902582,0.236314687,0.3,0.800875818,0.892648187,0.972574907,0.026466165
+stablev2v_short_output,0.919417687,1.7875,3.56,0.751332722,0.96382454,0.197835246,0.242328187,0.2,0.700009245,0.853475312,0.96382454,0.018734401
+insv2v_short_output,0.958194013,4.04875,3.0625,0.855545725,0.974884973,0.241118519,0.228607,0.3,0.950594383,0.936758721,0.974884973,0.044564379
+vace_short_output,0.965057666,4.0325,2.1625,0.885872829,0.975685519,0.237969796,0.215348436,0.2,0.968573943,0.949596825,0.975685519,0.044513347
