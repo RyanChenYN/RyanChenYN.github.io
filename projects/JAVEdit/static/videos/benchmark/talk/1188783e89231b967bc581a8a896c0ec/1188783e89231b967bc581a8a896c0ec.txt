@@ -1,0 +1,1 @@
+Adjust the character's dialogue to: 'whatever happens next, make sure the backup server stay online,' and synchronize the lip movements accordingly, keeping other visual elements in the frame unchanged.

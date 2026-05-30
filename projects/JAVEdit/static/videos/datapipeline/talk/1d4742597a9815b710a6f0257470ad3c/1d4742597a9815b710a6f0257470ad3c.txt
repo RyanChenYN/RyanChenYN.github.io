@@ -1,0 +1,1 @@
+Replace the spoken content so the person says \"Shut off the water valve. Replace the old rubber washer.\" while maintaining all visual and non-speech audio elements unchanged.

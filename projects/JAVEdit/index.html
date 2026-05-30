@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAVEdit — Joint Audio-Visual Instruction-Guided Video Editing</title>
+  <meta name="description" content="JAVEdit: Joint Audio-Visual Instruction-Guided Video Editing with an Agent-Curated Data Pipeline. Introduces JAVEdit-100k dataset, Agent-in-the-loop pipeline, and JAVEditBench benchmark.">
+  <meta name="keywords" content="video editing, audio-visual editing, instruction-guided, dataset, JAVEdit">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css" crossorigin>
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <style>
+    /* Inline overrides for the active nav link */
+    .navbar-links a.active { color: var(--terracotta); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ NAVBAR ═══════════════════════════════════ -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <span class="navbar-brand"><span>JAV</span>Edit</span>
+    <ul class="navbar-links">
+      <li><a href="#abstract">Abstract</a></li>
+      <li><a href="#examples">Examples</a></li>
+      <li><a href="#dataset">Dataset</a></li>
+      <li><a href="#results">Benchmark</a></li>
+      <li><a href="#qualitative">Qualitative</a></li>
+      <li><a href="#bibtex">Cite</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════ HERO ══════════════════════════════════════ -->
+<header class="hero">
+  <div class="container">
+    <h1 class="hero-title">
+      <span class="highlight">JAVEdit</span>: Joint Audio-Visual<br>
+      Instruction-Guided Video Editing<br>
+      <em style="font-weight:400; font-size:.78em">with Agentic Data Curation</em>
+    </h1>
+
+    <p class="hero-subtitle">
+      The first large-scale dataset &amp; benchmark for instruction-guided joint audio-visual editing,
+      paired with an Agent-in-the-loop curation pipeline and a strong baseline model.
+    </p>
+
+    <!-- Authors -->
+    <div class="authors-block">
+      <p class="authors-list">
+        <a href="https://github.com/RyanChenYN" class="author-link" target="_blank">Yinan Chen</a><sup>1*</sup>,&ensp;
+        <a href="https://linchuming.github.io/" class="author-link" target="_blank">Chuming Lin</a><sup>2*</sup>,&ensp;
+        <a href="https://scholar.google.com/citations?user=edoqkgoAAAAJ&hl=en" class="author-link" target="_blank">Zhennan Chen</a><sup>3</sup>,&ensp;
+        <a href="https://scholar.google.com/citations?user=gZvKCWoAAAAJ&hl=en" class="author-link" target="_blank">Yuxiang Zeng</a><sup>4</sup>,&ensp;
+        <a href="https://scholar.google.com/citations?user=-OxQlHsAAAAJ&hl=zh-CN" class="author-link" target="_blank">Junwei Zhu</a><sup>2</sup>,&ensp;
+        <a href="https://scholar.google.com/citations?user=8V6O60gAAAAJ&hl=zh-CN" class="author-link" target="_blank">Yali Bi</a><sup>1</sup>,&ensp;
+        <a href="https://chmxu.github.io/" class="author-link" target="_blank">Xijie Huang</a><sup>5</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Chengming Xu</a><sup>2</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Donghao Luo</a><sup>2</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Zhucun Xue</a><sup>1</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Xiaobin Hu</a><sup>6</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Chengjie Wang</a><sup>2</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Yong Liu</a><sup>1</sup>,&ensp;
+        <a href="#" class="author-link" target="_blank">Jiangning Zhang</a><sup>1,2</sup><a href="mailto:186368@zju.edu.cn"><sup>📧</sup></a>,&ensp;
+        <a href="#" class="author-link" target="_blank">Shuicheng Yan</a><sup>6</sup>
+      </p>
+      <div class="affil-list">
+        <span><sup class="affil-num">1</sup> Zhejiang University</span>
+        <span><sup class="affil-num">2</sup> Youtu Lab, Tencent</span>
+        <span><sup class="affil-num">3</sup> Nanjing University</span>
+        <span><sup class="affil-num">4</sup> University of Auckland</span>
+        <span><sup class="affil-num">5</sup> Fudan University</span>
+        <span><sup class="affil-num">6</sup> National University of Singapore</span>
+      </div>
+      <div class="author-notes">
+        <span><sup>*</sup> Equal contribution</span>&ensp;
+        <span><sup>📧</sup> Corresponding author</span>
+      </div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="btn-row">
+      <a href="https://arxiv.org/abs/XXXX.XXXXX" class="btn btn-primary" target="_blank">
+        <i class="ai ai-arxiv"></i> arXiv
+      </a>
+      <a href="https://github.com/RyanChenYN/JAVEdit" class="btn btn-navy" target="_blank">
+        <i class="fa-brands fa-github"></i> Code
+      </a>
+      <a href="https://huggingface.co/datasets/Coraxor/JAVEdit-100k" class="btn btn-mustard" target="_blank">
+        <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="HF" style="height:1.1em; vertical-align:middle;"> Dataset
+      </a>
+      <a href="#" class="btn btn-secondary" target="_blank">
+        <i class="fa-solid fa-cubes"></i> Models (Under Review)
+      </a>
+      <a href="#results" class="btn btn-secondary">
+        <i class="fa-solid fa-ranking-star"></i> Benchmark
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════ ABSTRACT ══════════════════════════════════ -->
+<section id="abstract" class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Abstract</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="abstract-card">
+      <p class="abstract-text">
+        While instruction-based video editing has seen significant progress, <strong>joint audio-visual editing</strong>
+        remains constrained by the absence of dedicated datasets and benchmarks. To bridge this gap,
+        we present <strong>JAVEdit-100k</strong>, the first large-scale, high-quality dataset tailored for
+        instruction-guided joint audio-visual editing. Focusing on human-centric videos, JAVEdit-100k
+        comprises approximately <strong>100K editing triplets</strong> spanning five distinct categories, including
+        subject editing and speech editing. This dataset is rigorously constructed via four meticulously
+        designed generation pipelines, seamlessly paired with an <strong>agent-in-the-loop quality control</strong>
+        mechanism. Furthermore, to address the lack of standardized evaluation within the field, we
+        introduce <strong>JAVEditBench</strong>, a comprehensive benchmark featuring curated source videos and
+        human-aligned instructions across all editing categories. Finally, we propose <strong>JAVEdit</strong>,
+        a pioneering baseline model for instruction-guided joint audio-visual editing. Experiments show
+        that JAVEdit outperforms all baselines on <strong>five of six evaluation metrics</strong>,
+        with a 26% relative gain in audio-visual synchrony over the strongest sequential alternative.
+        All data, code, and model weights will be publicly released.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ DATA EXAMPLES ═══════════════════════════ -->
+<section id="examples" class="section" style="background:var(--cream-dark)">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Editing Examples from JAVEdit-100k</h2>
+      <p class="section-desc">
+        Source videos and their instruction-guided edited counterparts, spanning all five editing categories.
+        Each pair modifies both the visual and audio streams simultaneously.
+      </p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="tab-bar" role="tablist">
+      <button class="tab-btn active" data-tab="ex-subject" role="tab" aria-selected="true">
+        <i class="fa-solid fa-user-pen"></i> Subject Editing
+      </button>
+      <button class="tab-btn" data-tab="ex-bg" role="tab">
+        <i class="fa-solid fa-image"></i> Background Editing
+      </button>
+      <button class="tab-btn" data-tab="ex-speech" role="tab">
+        <i class="fa-solid fa-microphone-lines"></i> Speech Editing
+      </button>
+      <button class="tab-btn" data-tab="ex-remove" role="tab">
+        <i class="fa-solid fa-user-minus"></i> Subject Removal
+      </button>
+      <button class="tab-btn" data-tab="ex-add" role="tab">
+        <i class="fa-solid fa-user-plus"></i> Subject Addition
+      </button>
+    </div>
+
+    <!-- ── Subject Editing ── -->
+    <div class="tab-panel active" id="ex-subject">
+      <div class="pair-grid">
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/0a16d2122d7b9e9fe6c2a6aa65b658e6/0a16d2122d7b9e9fe6c2a6aa65b658e6.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/0a16d2122d7b9e9fe6c2a6aa65b658e6/0a16d2122d7b9e9fe6c2a6aa65b658e6_person_attribute_editing_age_Centenarian.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the central figure with a centenarian exhibiting white hair, deep facial wrinkles, and a frail physical presence while preserving the kitchen background, camera position, and dialogue delivery."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/41bea2e111c10757247267f6280dea7e/41bea2e111c10757247267f6280dea7e.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/41bea2e111c10757247267f6280dea7e/41bea2e111c10757247267f6280dea7e_person_attribute_editing_subject_replacement_Swamp_monster.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the person with a swamp monster featuring muddy green skin, decaying plant growths, and textured swamp-like details while preserving the original side lighting, slow camera push-in, background with blinds, and the subject's forward gaze and spoken word 'Yes' delivered in a guttural voice."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/4c8dca29e1877a3bbf72e9747c40f267/4c8dca29e1877a3bbf72e9747c40f267.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/4c8dca29e1877a3bbf72e9747c40f267/4c8dca29e1877a3bbf72e9747c40f267_person_attribute_editing_gender_Female.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the person with a female while maintaining the same emotional expression, background, and audio delivery cues including choked speech, sniff, and sigh."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/0bba0af818855deef3c978c8ed2c5d9b/0bba0af818855deef3c978c8ed2c5d9b.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/person/0bba0af818855deef3c978c8ed2c5d9b/0bba0af818855deef3c978c8ed2c5d9b_person_attribute_editing_subject_replacement_Librarian.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the subject's attire with a beige cardigan over a white collared blouse, add black-framed glasses, and style their hair into a neat bun while maintaining the original background, camera position, and spoken dialogue content."</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Background Editing ── -->
+    <div class="tab-panel" id="ex-bg">
+      <div class="pair-grid">
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/1749b9cf546bac1a19e24f649ab5e3c0_background_editing_outdoor_Hiking_trail/1749b9cf546bac1a19e24f649ab5e3c0.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/1749b9cf546bac1a19e24f649ab5e3c0_background_editing_outdoor_Hiking_trail/1749b9cf546bac1a19e24f649ab5e3c0_background_editing_outdoor_Hiking_trail.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the background with a dense forest hiking trail featuring a dirt path surrounded by tall trees and lush greenery while maintaining the subject's position and natural outdoor lighting."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/1749dc0fbf5072fd6302650e2b3811af_background_editing_nature_Spring_garden/1749dc0fbf5072fd6302650e2b3811af.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/1749dc0fbf5072fd6302650e2b3811af_background_editing_nature_Spring_garden/1749dc0fbf5072fd6302650e2b3811af_background_editing_nature_Spring_garden.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the background with a vibrant spring garden scene filled with blooming pink and white flowers, cherry blossom branches, and lush greenery under bright sunlight."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/11473123ca88a2058083af5f1d82cbe9_background_editing_landmarks_Alcatraz_Island/11473123ca88a2058083af5f1d82cbe9.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/11473123ca88a2058083af5f1d82cbe9_background_editing_landmarks_Alcatraz_Island/11473123ca88a2058083af5f1d82cbe9_background_editing_landmarks_Alcatraz_Island.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the background with a clear, photorealistic view of Alcatraz Island while maintaining the same foreground subject's smoking actions, steady camera perspective, and vocal delivery."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/08b09d9649a4cb448430250c629bd077_background_editing_nature_Bog/08b09d9649a4cb448430250c629bd077.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/background/08b09d9649a4cb448430250c629bd077_background_editing_nature_Bog/08b09d9649a4cb448430250c629bd077_background_editing_nature_Bog.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the background with a bog landscape featuring wet, marshy terrain, scattered puddles, tall reeds, and an overcast sky while preserving the subject's position, attire, gestures, and vocal delivery unchanged from the original."</p>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- ── Speech Editing ── -->
+    <div class="tab-panel" id="ex-speech">
+      <div class="pair-grid">
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/1d1e10b03ae8ff4a967b12f82a378a55/1d1e10b03ae8ff4a967b12f82a378a55.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/1d1e10b03ae8ff4a967b12f82a378a55/1d1e10b03ae8ff4a967b12f82a378a55_talk.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Ensure the speaker delivers the line 'Profit margins require immediate strategic adjustments.' while maintaining all visual and non-speech audio elements unchanged."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/1d4742597a9815b710a6f0257470ad3c/1d4742597a9815b710a6f0257470ad3c.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/1d4742597a9815b710a6f0257470ad3c/1d4742597a9815b710a6f0257470ad3c_talk.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the spoken content so the person says 'Shut off the water valve. Replace the old rubber washer.' while maintaining all visual and non-speech audio elements unchanged."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/2bbf9420ac40f1fe25c7807db02160a7/2bbf9420ac40f1fe25c7807db02160a7.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/2bbf9420ac40f1fe25c7807db02160a7/2bbf9420ac40f1fe25c7807db02160a7_talk.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the spoken dialogue with the exact phrase: 'I need to grab milk, bread, and eggs now.'"</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/0bb3764de957cef39008d169398e04bc/0bb3764de957cef39008d169398e04bc.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/talk/0bb3764de957cef39008d169398e04bc/0bb3764de957cef39008d169398e04bc_talk.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Replace the spoken dialogue with 'Now string the beads carefully.'"</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Subject Removal ── -->
+    <div class="tab-panel" id="ex-remove">
+      <div class="pair-grid">
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/3ddaddcdebecbcba38d79d3b7176e840_remove/3ddaddcdebecbcba38d79d3b7176e840.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/3ddaddcdebecbcba38d79d3b7176e840_remove/3ddaddcdebecbcba38d79d3b7176e840_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Display the dimly lit room's background with the window showing blurred exterior lights and worn walls, accompanied by ambient atmospheric sounds and music without any human voices."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/1f0662c4ce1bc698c10b01467b1c7a25_remove/1f0662c4ce1bc698c10b01467b1c7a25.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/1f0662c4ce1bc698c10b01467b1c7a25_remove/1f0662c4ce1bc698c10b01467b1c7a25_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"The scene features the storefront with graffiti-covered windows, a dark door, and interior shelves visible through the glass, accompanied by ambient sounds without any human voices."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/2b8cfe36f16567d7a19c65b1616b9e6a_remove/2b8cfe36f16567d7a19c65b1616b9e6a.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/2b8cfe36f16567d7a19c65b1616b9e6a_remove/2b8cfe36f16567d7a19c65b1616b9e6a_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"The scene should depict an empty courtroom with wooden benches and paneled walls, accompanied by ambient background music without any human speech."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/28e0369e9d77d3a7f82a1ee3146984b0_remove/28e0369e9d77d3a7f82a1ee3146984b0.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/remove/28e0369e9d77d3a7f82a1ee3146984b0_remove/28e0369e9d77d3a7f82a1ee3146984b0_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"The video displays the casino background with slot machines featuring 'Giant Jackpot' signage, showcasing only the stationary machines and ambient lighting without any individuals present."</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Subject Addition ── -->
+    <div class="tab-panel" id="ex-add">
+      <div class="pair-grid">
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/6011be7e6ae6b166afa0be7e027043e2_remove/6011be7e6ae6b166afa0be7e027043e2_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/6011be7e6ae6b166afa0be7e027043e2_remove/6011be7e6ae6b166afa0be7e027043e2.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Include a woman in a black suit seated in the chair, maintaining her posture and presence within the environment, while retaining the background elements and original human vocalizations."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/8088c9b07d2107de3637c8eeb36d80ad_remove/8088c9b07d2107de3637c8eeb36d80ad_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/8088c9b07d2107de3637c8eeb36d80ad_remove/8088c9b07d2107de3637c8eeb36d80ad.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Include a woman with long wavy hair wearing black attire and gold earrings in the chapel, with her speaking the phrase 'That place where my mom and I had some of our best talks' while preserving the floral displays, wooden coffins, and ambient musical score."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/25244fb39f3f495af9352594a2b9e58b_remove/25244fb39f3f495af9352594a2b9e58b_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/25244fb39f3f495af9352594a2b9e58b_remove/25244fb39f3f495af9352594a2b9e58b.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"Insert a person wearing a gray shirt and a red cord necklace seated in the vehicle while holding a metallic thermos, with the background seats, window, and ambient sounds remaining unchanged."</p>
+          </div>
+        </div>
+
+        <div class="pair-item">
+          <div class="pair-videos">
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/9707c6293de38c90e759d1e61d40bae3_remove/9707c6293de38c90e759d1e61d40bae3_remove.mp4" muted loop playsinline controls></video>
+              <span class="video-label src-label">Source</span>
+            </div>
+            <div class="pair-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="video-wrap">
+              <video src="static/videos/datapipeline/add/9707c6293de38c90e759d1e61d40bae3_remove/9707c6293de38c90e759d1e61d40bae3.mp4" muted loop playsinline controls></video>
+              <span class="video-label edit-label">Target</span>
+            </div>
+          </div>
+          <div class="pair-instruction">
+            <span class="inst-label"><i class="fa-solid fa-pen-to-square"></i> Instruction</span>
+            <p>"A person with gray hair and glasses, dressed in a dark button-up shirt, sits in the brown leather chair facing the bookshelf while speaking, with the background and ambient music unchanged."</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ CONTRIBUTIONS ════════════════════════════ -->
+<section class="section-sm" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Three Pillars of JAVEdit</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="feat-grid">
+
+      <!-- Card 1: Dataset -->
+      <div class="feat-card">
+        <div class="feat-card-art">
+          <!-- Abstract hand-drawn line art: stacked video frames + audio waves -->
+          <svg viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- background squiggles -->
+            <path d="M10 120 Q40 90 70 115 Q100 140 130 110 Q160 80 190 105" stroke="black" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+            <!-- frame 3 (back) -->
+            <rect x="55" y="20" width="110" height="78" rx="4" stroke="black" stroke-width="1.8" opacity=".3"/>
+            <!-- frame 2 (mid) -->
+            <rect x="40" y="28" width="110" height="78" rx="4" stroke="black" stroke-width="1.8" opacity=".55"/>
+            <!-- frame 1 (front) -->
+            <rect x="25" y="36" width="110" height="78" rx="4" stroke="black" stroke-width="2"/>
+            <!-- play triangle -->
+            <path d="M65 68 L92 76 L65 84 Z" stroke="black" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- audio wave -->
+            <path d="M150 60 Q155 50 160 60 Q165 70 170 60 Q175 50 180 60" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M148 75 Q154 62 160 75 Q166 88 172 75" stroke="black" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
+            <!-- dots -->
+            <circle cx="155" cy="95" r="2.5" fill="black" opacity=".5"/>
+            <circle cx="165" cy="100" r="2" fill="black" opacity=".35"/>
+            <circle cx="173" cy="93" r="1.5" fill="black" opacity=".25"/>
+          </svg>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-card-num">Dataset · 01</div>
+          <h3 class="feat-card-title">JAVEdit-100k</h3>
+          <p class="feat-card-desc">
+            The first large-scale dataset for instruction-guided joint audio-visual editing.
+            ~100K human-centric editing triplets across 5 categories at 720p resolution.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 2: Pipeline -->
+      <div class="feat-card">
+        <div class="feat-card-art">
+          <!-- Abstract hand-drawn line art: agent loop / gear / inspect -->
+          <svg viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- scattered dots background -->
+            <circle cx="30" cy="20" r="2" fill="black" opacity=".25"/>
+            <circle cx="175" cy="30" r="2" fill="black" opacity=".2"/>
+            <circle cx="170" cy="120" r="2.5" fill="black" opacity=".3"/>
+            <!-- outer gear-like circle -->
+            <circle cx="100" cy="70" r="40" stroke="black" stroke-width="1.8" stroke-dasharray="8 4"/>
+            <!-- inner circle -->
+            <circle cx="100" cy="70" r="22" stroke="black" stroke-width="2"/>
+            <!-- center dot -->
+            <circle cx="100" cy="70" r="5" stroke="black" stroke-width="1.8"/>
+            <!-- arrow loop -->
+            <path d="M60 70 Q60 30 100 30" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M100 30 Q140 30 140 70" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M140 70 Q140 110 100 110" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M100 110 Q60 110 60 70" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- arrowhead -->
+            <path d="M55 65 L60 70 L66 65" stroke="black" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- sparkle top-right -->
+            <path d="M168 25 L170 18 L172 25 L179 27 L172 29 L170 36 L168 29 L161 27 Z" stroke="black" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-card-num">Pipeline · 02</div>
+          <h3 class="feat-card-title">Agent-in-the-Loop</h3>
+          <p class="feat-card-desc">
+            A closed-loop multi-agent quality control system with an Orchestrator (Claude) and Inspector (Gemini),
+            raising data pass rate from 36% to 83%.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 3: Benchmark + Model -->
+      <div class="feat-card">
+        <div class="feat-card-art">
+          <!-- Abstract hand-drawn line art: bar chart + medal -->
+          <svg viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- wavy baseline -->
+            <path d="M10 115 Q50 110 100 115 Q150 120 190 112" stroke="black" stroke-width="1.2" stroke-linecap="round" opacity=".3"/>
+            <!-- bars -->
+            <rect x="30" y="75" width="22" height="38" rx="3" stroke="black" stroke-width="1.8"/>
+            <rect x="62" y="55" width="22" height="58" rx="3" stroke="black" stroke-width="1.8"/>
+            <rect x="94" y="40" width="22" height="73" rx="3" stroke="black" stroke-width="1.8"/>
+            <rect x="126" y="60" width="22" height="53" rx="3" stroke="black" stroke-width="1.8" opacity=".55"/>
+            <!-- star on tallest bar -->
+            <path d="M105 32 L107 26 L109 32 L115 32 L110 36 L112 42 L107 38 L102 42 L104 36 L99 32 Z" stroke="black" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- floating dots -->
+            <circle cx="165" cy="50" r="3" stroke="black" stroke-width="1.5" opacity=".5"/>
+            <circle cx="175" cy="65" r="2" stroke="black" stroke-width="1.2" opacity=".4"/>
+            <circle cx="158" cy="72" r="1.5" fill="black" opacity=".3"/>
+            <!-- arrow up -->
+            <path d="M168 95 L168 75" stroke="black" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M162 81 L168 75 L174 81" stroke="black" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="feat-card-body">
+          <div class="feat-card-num">Benchmark &amp; Model · 03</div>
+          <h3 class="feat-card-title">JAVEditBench + JAVEdit</h3>
+          <p class="feat-card-desc">
+            A 150-video benchmark with 6 human-aligned metrics, plus a LoRA fine-tuned LTX-2.3 model
+            that achieves state-of-the-art performance.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ STATS STRIP ══════════════════════════════ -->
+<div class="stats-strip">
+  <div class="container">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-num" data-target="100" data-suffix="K">0K</div>
+        <div class="stat-label">Edit Triplets</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="5">0</div>
+        <div class="stat-label">Editing Tasks</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="83" data-suffix="%">0%</div>
+        <div class="stat-label">Pass Rate (Agent QC)</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="150">0</div>
+        <div class="stat-label">Benchmark Videos</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="6">0</div>
+        <div class="stat-label">Eval Metrics</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DATASET ═══════════════════════════════════ -->
+<section id="dataset" class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">JAVEdit-100k Dataset</h2>
+      <p class="section-desc">
+        The first large-scale, instruction-guided joint audio-visual editing dataset,
+        built for human-centric video editing at scale.
+      </p>
+      <div class="divider"></div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:3rem; align-items:center">
+      <div>
+        <h3 style="margin-bottom:1rem">What Makes JAVEdit-100k Unique?</h3>
+        <ul class="contrib-list">
+          <li>
+            <span class="contrib-dot"></span>
+            <span>Only dataset supporting <strong>joint audio-visual editing</strong> with free-form natural language instructions.</span>
+          </li>
+          <li>
+            <span class="contrib-dot"></span>
+            <span>Covers <strong>five distinct editing categories</strong>: subject editing, background editing, speech editing, subject removal, and subject addition.</span>
+          </li>
+          <li>
+            <span class="contrib-dot"></span>
+            <span>All videos at <strong>1280×720 / 121 frames / 25 fps</strong>, carefully curated for strict cross-modal alignment.</span>
+          </li>
+          <li>
+            <span class="contrib-dot"></span>
+            <span>Quality controlled via an <strong>agent-in-the-loop mechanism</strong> that automatically inspects, diagnoses, and fixes data quality issues, eliminating the need for costly manual review.</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <!-- Dataset comparison table -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="text-align:left">Dataset</th>
+                <th>Scale</th>
+                <th>Audio</th>
+                <th>Instruction</th>
+                <th>Agent QC</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="opacity:.7">
+                <td>InsViE-1M</td><td>~1M</td>
+                <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+                <td><i class="fa-solid fa-check" style="color:#6aab6a"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+              </tr>
+              <tr style="opacity:.7">
+                <td>OpenVE-3M</td><td>~3M</td>
+                <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+                <td><i class="fa-solid fa-check" style="color:#6aab6a"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+              </tr>
+              <tr style="opacity:.7">
+                <td>AVI-Edit</td><td>~73K</td>
+                <td><i class="fa-solid fa-check" style="color:#6aab6a"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+                <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+              </tr>
+              <tr class="ours">
+                <td><strong>JAVEdit-100k</strong></td><td>~103K</td>
+                <td><i class="fa-solid fa-check" style="color:var(--terracotta)"></i></td>
+                <td><i class="fa-solid fa-check" style="color:var(--terracotta)"></i></td>
+                <td><i class="fa-solid fa-check" style="color:var(--terracotta)"></i></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 Categories -->
+    <h3 style="text-align:center; margin-bottom:1.5rem; color:var(--mid)">Five Editing Categories</h3>
+    <div class="categories-grid">
+
+      <div class="cat-card">
+        <div class="cat-icon"><i class="fa-solid fa-user-pen"></i></div>
+        <div class="cat-title">Subject Editing</div>
+        <p style="font-size:.78rem; color:var(--light); margin-top:.4rem">Alter subject appearance while synchronously updating voice style &amp; timbre</p>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-icon"><i class="fa-solid fa-image"></i></div>
+        <div class="cat-title">Background Editing</div>
+        <p style="font-size:.78rem; color:var(--light); margin-top:.4rem">Change environment or scene with ambient sound updated to match</p>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+        <div class="cat-title">Speech Editing</div>
+        <p style="font-size:.78rem; color:var(--light); margin-top:.4rem">Alter spoken content with lip motion synchronized to new speech</p>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-icon"><i class="fa-solid fa-user-minus"></i></div>
+        <div class="cat-title">Subject Removal</div>
+        <p style="font-size:.78rem; color:var(--light); margin-top:.4rem">Remove a human subject together with the associated voice stream</p>
+      </div>
+
+      <div class="cat-card">
+        <div class="cat-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <div class="cat-title">Subject Addition</div>
+        <p style="font-size:.78rem; color:var(--light); margin-top:.4rem">Insert a human subject into a scene with the corresponding voice</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ RESULTS ═══════════════════════════════════ -->
+<section id="results" class="section" style="background:var(--cream-dark)">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Quantitative Results on JAVEditBench</h2>
+      <p class="section-desc">
+        JAVEditBench evaluation across 150 videos using 6 human-aligned metrics.
+      </p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Highlight numbers -->
+    <div class="result-highlights">
+      <div class="rh-card">
+        <div class="rh-num">5/6</div>
+        <div class="rh-label">Metrics where JAVEdit ranks #1</div>
+      </div>
+      <div class="rh-card">
+        <div class="rh-num">+26%</div>
+        <div class="rh-label">Relative gain in AV Sync vs. Sequential</div>
+      </div>
+      <div class="rh-card">
+        <div class="rh-num">≥0.80</div>
+        <div class="rh-label">Spearman's ρ with human judgment</div>
+      </div>
+    </div>
+
+    <!-- Main Results Table -->
+    <div class="table-wrap" style="margin-bottom:2rem">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left; width:160px">Method</th>
+            <th>Visual Quality ↑</th>
+            <th>Audio Quality ↑</th>
+            <th>AV Sync ↑</th>
+            <th>Instruction Compliance ↑</th>
+            <th>Video Fidelity ↑</th>
+            <th>AV Quality ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>AVED</td>
+            <td>0.0590</td>
+            <td>1.72</td>
+            <td>0.1641</td>
+            <td>2.95</td>
+            <td>3.87</td>
+            <td>2.93</td>
+          </tr>
+          <tr>
+            <td>AVI-Edit</td>
+            <td class="best">0.0604</td>
+            <td>2.34</td>
+            <td>0.2721</td>
+            <td>3.49</td>
+            <td>3.89</td>
+            <td>3.86</td>
+          </tr>
+          <tr>
+            <td>Sequential</td>
+            <td>0.0563</td>
+            <td>2.35</td>
+            <td>0.2925</td>
+            <td>3.99</td>
+            <td>4.08</td>
+            <td>3.51</td>
+          </tr>
+          <tr class="ours">
+            <td>JAVEdit <em style="font-family:var(--sans); font-size:.78rem; color:var(--terracotta); font-style:normal">(Ours)</em></td>
+            <td>0.0596</td>
+            <td class="best">2.42</td>
+            <td class="best">0.3688</td>
+            <td class="best">4.07</td>
+            <td class="best">4.22</td>
+            <td class="best">3.88</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-caption">
+        Table 1: Quantitative comparison on JAVEditBench. <strong>Bold</strong> = best. Sequential cascades Kiwi-Edit with HunyuanVideo-Foley.
+      </div>
+    </div>
+
+    <!-- Ablation Table -->
+    <h3 style="margin-bottom:1rem">Ablation Study</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left">Model</th>
+            <th>Scale</th>
+            <th>Agent QC</th>
+            <th>Visual Q ↑</th>
+            <th>Audio Q ↑</th>
+            <th>AV Sync ↑</th>
+            <th>IC ↑</th>
+            <th>Fidelity ↑</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>JAVEdit-tiny</td>
+            <td>5K</td>
+            <td><i class="fa-solid fa-check" style="color:#6aab6a"></i></td>
+            <td>0.0574</td><td>2.38</td><td>0.2453</td><td>3.21</td><td>3.95</td>
+          </tr>
+          <tr>
+            <td>JAVEdit-small</td>
+            <td>15K</td>
+            <td><i class="fa-solid fa-check" style="color:#6aab6a"></i></td>
+            <td>0.0579</td><td>2.44</td><td>0.2871</td><td>3.49</td><td>4.18</td>
+          </tr>
+          <tr>
+            <td>JAVEdit w/o Agent</td>
+            <td>100K</td>
+            <td><i class="fa-solid fa-xmark" style="color:#c0b0a0"></i></td>
+            <td>0.0581</td><td>2.31</td><td>0.3012</td><td>3.61</td><td>4.05</td>
+          </tr>
+          <tr class="ours">
+            <td>JAVEdit <em style="font-family:var(--sans); font-size:.78rem; color:var(--terracotta); font-style:normal">(Ours)</em></td>
+            <td>100K</td>
+            <td><i class="fa-solid fa-check" style="color:var(--terracotta)"></i></td>
+            <td class="best">0.0596</td><td class="best">2.42</td><td class="best">0.3688</td><td class="best">4.07</td><td class="best">4.22</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-caption">
+        Table 2: Ablation on JAVEditBench. Agent-in-the-loop QC and data scale are complementary — both are necessary for best performance.
+      </div>
+    </div>
+
+    <!-- Metric pills explanation -->
+    <div style="margin-top:1.5rem">
+      <p style="font-size:.85rem; color:var(--light); margin-bottom:.6rem">Evaluation metrics:</p>
+      <div class="metric-pills">
+        <span class="pill"><i class="fa-solid fa-eye"></i> Visual Quality (VTSS)</span>
+        <span class="pill"><i class="fa-solid fa-music"></i> Audio Quality (UTMOSv2)</span>
+        <span class="pill"><i class="fa-solid fa-link"></i> AV Sync (SyncNet)</span>
+        <span class="pill"><i class="fa-solid fa-list-check"></i> Instruction Compliance</span>
+        <span class="pill"><i class="fa-solid fa-film"></i> Video Fidelity</span>
+        <span class="pill"><i class="fa-solid fa-star"></i> AV Quality (Qwen3-Omni)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ QUALITATIVE COMPARISON ══════════════════ -->
+<section id="qualitative" class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Qualitative Results on JAVEditBench</h2>
+      <p class="section-desc">
+        Side-by-side comparison of source videos and outputs from four methods across all editing categories.
+      </p>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Category tab bar -->
+    <div class="cmp-tab-bar">
+      <button class="cmp-tab-btn active" data-cmp-cat="Subject Editing">
+        <i class="fa-solid fa-user-pen"></i> Subject Editing
+      </button>
+      <button class="cmp-tab-btn" data-cmp-cat="Background Editing">
+        <i class="fa-solid fa-image"></i> Background Editing
+      </button>
+      <button class="cmp-tab-btn" data-cmp-cat="Speech Editing">
+        <i class="fa-solid fa-microphone-lines"></i> Speech Editing
+      </button>
+      <button class="cmp-tab-btn" data-cmp-cat="Subject Removal">
+        <i class="fa-solid fa-user-minus"></i> Subject Removal
+      </button>
+      <button class="cmp-tab-btn" data-cmp-cat="Subject Addition">
+        <i class="fa-solid fa-user-plus"></i> Subject Addition
+      </button>
+    </div>
+
+    <!-- Viewer -->
+    <div class="cmp-viewer">
+
+      <!-- Top nav bar -->
+      <div class="cmp-nav">
+        <button class="cmp-btn" id="cmp-prev" disabled>
+          <i class="fa-solid fa-chevron-left"></i> Prev
+        </button>
+        <div class="cmp-nav-info">
+          <span class="cmp-counter">Case <span id="cmp-idx">1</span> / <span id="cmp-total">2</span></span>
+        </div>
+        <button class="cmp-btn" id="cmp-next">
+          Next <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <!-- Instruction banner -->
+      <div class="cmp-instruction-bar" id="cmp-instr">
+        <i class="fa-solid fa-pen-to-square" style="color:var(--terracotta)"></i>
+        <span></span>
+      </div>
+
+      <!-- Comparison groups (one shown at a time via JS) -->
+
+      <!-- Group 1: Subject Editing - Case 1 -->
+      <div class="cmp-group active" data-group="0" data-cat="Subject Editing"
+           data-instr="Replace the man with a bald figure, with wrinkles all over the face, keeping the camera trajectory and the subject's movements unchanged.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/person/0b4200cfed4eb4b29f5732d0447c0c9e/0b4200cfed4eb4b29f5732d0447c0c9e.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/person/0b4200cfed4eb4b29f5732d0447c0c9e/0b4200cfed4eb4b29f5732d0447c0c9e_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/person/0b4200cfed4eb4b29f5732d0447c0c9e/0b4200cfed4eb4b29f5732d0447c0c9e_avi_edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/person/0b4200cfed4eb4b29f5732d0447c0c9e/0b4200cfed4eb4b29f5732d0447c0c9e_kiwi_edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/person/0b4200cfed4eb4b29f5732d0447c0c9e/0b4200cfed4eb4b29f5732d0447c0c9e_my_model.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 2: Subject Editing - Case 2 -->
+      <div class="cmp-group" data-group="1" data-cat="Subject Editing"
+           data-instr="Modify the young woman in the picture to an elderly white woman of about 70 years old, with elegant silver curly hair and natural age wrinkles on her face, while keeping her clothing, pose, expression, camera movement, and background unchanged.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/person/3c21f32f5bd5583e8a996bfb4a7fc505/3c21f32f5bd5583e8a996bfb4a7fc505.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/person/3c21f32f5bd5583e8a996bfb4a7fc505/3c21f32f5bd5583e8a996bfb4a7fc505_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/person/3c21f32f5bd5583e8a996bfb4a7fc505/3c21f32f5bd5583e8a996bfb4a7fc505_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/person/3c21f32f5bd5583e8a996bfb4a7fc505/3c21f32f5bd5583e8a996bfb4a7fc505_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/person/3c21f32f5bd5583e8a996bfb4a7fc505/3c21f32f5bd5583e8a996bfb4a7fc505_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 3: Background Editing - Case 1 -->
+      <div class="cmp-group" data-group="2" data-cat="Background Editing"
+           data-instr="Replace the background with a snow-covered forest cabin, with heavy snow visible through the windows and a distant cedar forest. A faint warm light from the fireplace shines inside. Keep the character in the foreground, their clothing, the action of leaning by the window, and their serious expression completely unchanged.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/background/a56f37e26b9942b21aabf217b8627498/a56f37e26b9942b21aabf217b8627498.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/background/a56f37e26b9942b21aabf217b8627498/a56f37e26b9942b21aabf217b8627498_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/background/a56f37e26b9942b21aabf217b8627498/a56f37e26b9942b21aabf217b8627498_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/background/a56f37e26b9942b21aabf217b8627498/a56f37e26b9942b21aabf217b8627498_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/background/a56f37e26b9942b21aabf217b8627498/a56f37e26b9942b21aabf217b8627498_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 4: Background Editing - Case 2 -->
+      <div class="cmp-group" data-group="3" data-cat="Background Editing"
+           data-instr="Replace the background with a Russian-style palace garden, with dense greenery in the background, while keeping the figure in the foreground, clothing, necklace, posture, and expression exactly the same.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/background/97901d31cad688c490d0075506383c99/b7b83e4aec8eb9fc1d9eaa750232f9b8.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/background/97901d31cad688c490d0075506383c99/b7b83e4aec8eb9fc1d9eaa750232f9b8_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/background/97901d31cad688c490d0075506383c99/b7b83e4aec8eb9fc1d9eaa750232f9b8_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/background/97901d31cad688c490d0075506383c99/b7b83e4aec8eb9fc1d9eaa750232f9b8_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/background/97901d31cad688c490d0075506383c99/b7b83e4aec8eb9fc1d9eaa750232f9b8_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 5: Speech Editing - Case 1 -->
+      <div class="cmp-group" data-group="4" data-cat="Speech Editing"
+           data-instr="Adjust the character's dialogue to: 'whatever happens next, make sure the backup server stay online,' and synchronize the lip movements accordingly, keeping other visual elements in the frame unchanged.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/talk/1188783e89231b967bc581a8a896c0ec/1188783e89231b967bc581a8a896c0ec.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/talk/1188783e89231b967bc581a8a896c0ec/1188783e89231b967bc581a8a896c0ec_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/talk/1188783e89231b967bc581a8a896c0ec/1188783e89231b967bc581a8a896c0ec_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/talk/1188783e89231b967bc581a8a896c0ec/1188783e89231b967bc581a8a896c0ec_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/talk/1188783e89231b967bc581a8a896c0ec/1188783e89231b967bc581a8a896c0ec_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 6: Speech Editing - Case 2 -->
+      <div class="cmp-group" data-group="5" data-cat="Speech Editing"
+           data-instr="Replace the character's lines with: 'Hold on tight as the dragon takes flight,' while keeping all visual elements and background sounds exactly the same as the original scene.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/talk/99e875c814283eef6cafb42068b6c30a/99e875c814283eef6cafb42068b6c30a.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/talk/99e875c814283eef6cafb42068b6c30a/99e875c814283eef6cafb42068b6c30a_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/talk/99e875c814283eef6cafb42068b6c30a/99e875c814283eef6cafb42068b6c30a_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/talk/99e875c814283eef6cafb42068b6c30a/99e875c814283eef6cafb42068b6c30a_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/talk/99e875c814283eef6cafb42068b6c30a/99e875c814283eef6cafb42068b6c30a_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 7: Subject Removal - Case 1 -->
+      <div class="cmp-group" data-group="6" data-cat="Subject Removal"
+           data-instr="Remove the man wearing white from the original video, keeping the blurred view outside the window in the background.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/remove/0cee9bd2711e165a11b76db0fd4bdc58/0cee9bd2711e165a11b76db0fd4bdc58.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/remove/0cee9bd2711e165a11b76db0fd4bdc58/0cee9bd2711e165a11b76db0fd4bdc58_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/remove/0cee9bd2711e165a11b76db0fd4bdc58/0cee9bd2711e165a11b76db0fd4bdc58_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/remove/0cee9bd2711e165a11b76db0fd4bdc58/0cee9bd2711e165a11b76db0fd4bdc58_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/remove/0cee9bd2711e165a11b76db0fd4bdc58/0cee9bd2711e165a11b76db0fd4bdc58_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 8: Subject Removal - Case 2 -->
+      <div class="cmp-group" data-group="7" data-cat="Subject Removal"
+           data-instr="Remove the woman with blood on her face in the center of the screen from the original video, keeping the blurred hotel environment in the background.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/remove/0f19e4f00a0812374143bdbbf841cebd/0f19e4f00a0812374143bdbbf841cebd.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/remove/0f19e4f00a0812374143bdbbf841cebd/0f19e4f00a0812374143bdbbf841cebd_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/remove/0f19e4f00a0812374143bdbbf841cebd/0f19e4f00a0812374143bdbbf841cebd_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/remove/0f19e4f00a0812374143bdbbf841cebd/0f19e4f00a0812374143bdbbf841cebd_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/remove/0f19e4f00a0812374143bdbbf841cebd/0f19e4f00a0812374143bdbbf841cebd_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 9: Subject Addition - Case 1 -->
+      <div class="cmp-group" data-group="8" data-cat="Subject Addition"
+           data-instr="Add a woman wearing a dark top, with multiple necklaces and earrings, into the scene, have her speak lines, while keeping the leather chair background and ambient music.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/add/978efa6d6a7a4633aa66e48f70ab5236/978efa6d6a7a4633aa66e48f70ab5236.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/add/978efa6d6a7a4633aa66e48f70ab5236/978efa6d6a7a4633aa66e48f70ab5236_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/add/978efa6d6a7a4633aa66e48f70ab5236/978efa6d6a7a4633aa66e48f70ab5236_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/add/978efa6d6a7a4633aa66e48f70ab5236/978efa6d6a7a4633aa66e48f70ab5236_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/add/978efa6d6a7a4633aa66e48f70ab5236/978efa6d6a7a4633aa66e48f70ab5236_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 10: Subject Addition - Case 2 -->
+      <div class="cmp-group" data-group="9" data-cat="Subject Addition"
+           data-instr="Include a person with curly hair wearing a blue sweatshirt speaking in the scene, while keeping the original background and ambient sounds.">
+        <div class="cmp-source-row">
+          <div class="cmp-cell cmp-source-cell">
+            <div class="cmp-method-label src-lbl">Source</div>
+            <video src="static/videos/benchmark/add/496f09ff78503af3d76f5b7c310e1291/496f09ff78503af3d76f5b7c310e1291.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+        <div class="cmp-methods-row">
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVED</div>
+            <video src="static/videos/benchmark/add/496f09ff78503af3d76f5b7c310e1291/496f09ff78503af3d76f5b7c310e1291_aved.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">AVI-Edit</div>
+            <video src="static/videos/benchmark/add/496f09ff78503af3d76f5b7c310e1291/496f09ff78503af3d76f5b7c310e1291_avi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell">
+            <div class="cmp-method-label">Sequential</div>
+            <video src="static/videos/benchmark/add/496f09ff78503af3d76f5b7c310e1291/496f09ff78503af3d76f5b7c310e1291_kiwi-edit.mp4" muted loop playsinline controls></video>
+          </div>
+          <div class="cmp-cell ours-cell">
+            <div class="cmp-method-label ours-lbl">JAVEdit <span>(Ours)</span></div>
+            <video src="static/videos/benchmark/add/496f09ff78503af3d76f5b7c310e1291/496f09ff78503af3d76f5b7c310e1291_ours.mp4" muted loop playsinline controls></video>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.cmp-viewer -->
+  </div>
+</section>
+
+<!-- ═══════════════════ BIBTEX ════════════════════════════════════ -->
+<section id="bibtex" class="section">
+  <div class="container" style="max-width:860px">
+    <div class="section-header">
+      <h2 class="section-title">BibTeX</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="bibtex-block">
+      <div class="bibtex-header">
+        <span>BibTeX</span>
+        <button class="copy-btn" id="copy-bibtex">Copy</button>
+      </div>
+      <pre id="bibtex-content"><span class="kw">@article</span>{chen2026javedit,
+  <span class="val">title</span>     = {JAVEdit: Joint Audio-Visual Instruction-Guided Video Editing
+               with an Agent-Curated Data Pipeline},
+  <span class="val">author</span>    = {Chen, Yinan and Lin, Chuming and Chen, Zhennan and Zeng, Yuxiang
+               and Zhu, Junwei and Bi, Yali and Huang, Xijie and Xu, Chengming
+               and Luo, Donghao and Xue, Zhucun and Hu, Xiaobin
+               and Wang, Chengjie and Liu, Yong and Zhang, Jiangning
+               and Yan, Shuicheng},
+  <span class="val">journal</span>   = {arXiv preprint arXiv:XXXX.XXXXX},
+  <span class="val">year</span>      = {2026}
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <p style="color:rgba(255,255,255,.7); font-size:1rem; font-family:var(--serif); margin-bottom:.75rem">
+      JAVEdit
+    </p>
+    <p>
+      Yinan Chen, Chuming Lin, Zhennan Chen, et al. &bull;
+      ZJU &bull; Youtu Lab Tencent &bull; NJU &bull; UoA &bull; FDU &bull; NUS
+    </p>
+    <p style="margin-top:.5rem">
+      Project page template inspired by
+      <a href="https://nerfies.github.io/" target="_blank">Nerfies</a>.
+      This website is licensed under
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>.
+    </p>
+  </div>
+</footer>
+
+<script src="static/js/index.js"></script>
+</body>
+</html>
